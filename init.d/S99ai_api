@@ -1,0 +1,50 @@
+#!/bin/bash
+### BEGIN INIT INFO
+# Provides:     ai_api
+# Should-Start:     $local_fs
+# Should-Stop:      $local_fs
+# Default-Start:    2 3 4 5
+# Default-Stop:     0 1 6
+# Short-Description:    ai_api
+# Description:      ai_api
+### END INIT INFO
+
+: ${THIRD_ROOT:=/opt/third}
+export THIRD_ROOT
+
+NAME=ai_api
+DAEMON=$THIRD_ROOT/etsai/bin/etsai_api
+#DAEMON_ARGS="--verbose --recv --name DJI --stream rtmp://0.0.0.0:1935/live/dji"
+PID_FILE=/var/run/third_$NAME.pid
+
+case "$1" in
+    start)
+        echo -n "Start $NAME: "
+        if start-stop-daemon --start --background --quiet --make-pidfile --pidfile $PID_FILE --exec $DAEMON; then
+            echo "[OK]"
+        else
+            echo "Failed"
+        fi
+        ;;
+    stop)
+        echo -n "Stop $NAME: "
+        if [ -e $PID_FILE ]; then
+            pid=$(cat $PID_FILE)
+            pgid=$(ps --no-headers -o pgid $pid)
+        fi
+        if [ -z "$pgid" ] || pkill -g $pgid; then
+            echo "[OK]"
+        else
+            echo "Failed"
+        fi
+        rm -f $PID_FILE
+        ;;
+    restart|reload)
+        $0 stop
+        $0 start
+        ;;
+    *)
+        echo "Usage: $0 {start|stop|restart}"
+        exit 1
+esac
+

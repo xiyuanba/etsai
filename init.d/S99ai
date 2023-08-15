@@ -1,0 +1,52 @@
+#!/bin/bash
+### BEGIN INIT INFO
+# Provides:     ai
+# Should-Start:     $local_fs
+# Should-Stop:      $local_fs
+# Default-Start:    2 3 4 5
+# Default-Stop:     0 1 6
+# Short-Description:    ai
+# Description:      ai
+### END INIT INFO
+
+sleep 20
+
+THIRD_ROOT="/opt/third"
+export THIRD_ROOT
+export HOME="/home/etsme"
+NAME="flow"
+DAEMON="${THIRD_ROOT}/etsai/bin/etsai"
+
+LOG_FILE="/mnt/md0/log/services/etsai/start.log"
+
+case "$1" in
+    start)
+        echo -n "Start $NAME: "
+        if start-stop-daemon --start --background --quiet --exec $DAEMON; then
+            echo "[OK]"
+            echo "$(date): Started $NAME" >> $LOG_FILE
+        else
+            echo "Failed"
+            echo "$(date): Failed to start $NAME" >> $LOG_FILE
+        fi
+        ;;
+    stop)
+        echo -n "Stop $NAME: "
+        if pkill -f "$NAME"; then
+            echo "[OK]"
+            echo "$(date): Stopped $NAME" >> $LOG_FILE
+        else
+            echo "Failed"
+            echo "$(date): Failed to stop $NAME" >> $LOG_FILE
+        fi
+        ;;
+    restart|reload)
+        $0 stop
+        sleep 1
+        $0 start
+        ;;
+    *)
+        echo "Usage: $0 {start|stop|restart}"
+        exit 1
+esac
+

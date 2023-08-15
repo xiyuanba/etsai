@@ -1,0 +1,25 @@
+#!/bin/bash
+
+: ${THIRD_ROOT:=/opt/third}
+
+# set PATH
+for d in etsai_python/python3.8; do
+    export PATH=${THIRD_ROOT}/$d/bin:$PATH
+done
+#echo $PATH | tr : '\n'
+
+# set PYTHON PATH
+for p in etsai_python/python3.8/lib/python3.8; do
+    export PYTHONPATH=${THIRD_ROOT}/$p:$PYTHONPATH
+    export PYTHONPATH=${THIRD_ROOT}/$p/site-packages:$PYTHONPATH
+    export PYTHONPATH=${THIRD_ROOT}/$p/dist-packages:$PYTHONPATH
+done
+# echo $PYTHONPATH | tr : '\n'
+which python
+which streamlit
+streamlit_path=$(which streamlit)
+
+echo "Python 路径: $python_path"
+echo "Streamlit 路径: $streamlit_path"
+
+exec python $streamlit_path run $THIRD_ROOT/etsai/app.py
